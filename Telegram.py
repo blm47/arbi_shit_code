@@ -219,7 +219,7 @@ def get_all_balans(acc_name,time=str(datetime.now())[:10]): #yyyy-mm-dd hh:mm:ss
     try:
         all_balans = bd.read('balans_log',{'account_name':acc_name,'cur_time':'{0}%'.format(str(time)[:-4])})[-1][2]
     except IndexError:
-        return [{},{},0,0,'Не удалось получить баланс из базы, попробуйте позже']
+        return [{},{},0,0,'\n <b>Не удалось получить баланс из базы, попробуйте позже</b>']
     all_balans = json.loads(all_balans.strip().replace("'", '"'))
     all_not_null_balans = {}
     all_not_null_balans_po_param = {}
