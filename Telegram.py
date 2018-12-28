@@ -216,7 +216,10 @@ def get_all_balans(acc_name,time=str(datetime.now())[:10]): #yyyy-mm-dd hh:mm:ss
     err = ''
     order_book_exmo= get_order_book_exmo()
     bd = MarketClass.DataBase('local', 'local.db')
-    all_balans = bd.read('balans_log',{'account_name':acc_name,'cur_time':'{0}%'.format(str(time)[:-4])})[-1][2]
+    try:
+        all_balans = bd.read('balans_log',{'account_name':acc_name,'cur_time':'{0}%'.format(str(time)[:-4])})[-1][2]
+    except IndexError:
+        return [{},{},0,0,'Не удалось получить баланс из базы, попробуйте позже']
     all_balans = json.loads(all_balans.strip().replace("'", '"'))
     all_not_null_balans = {}
     all_not_null_balans_po_param = {}
@@ -656,9 +659,10 @@ def start_polling():
     try:
         bot.polling(none_stop=True)
     except Exception as err:
+        print(err)
         time.sleep(23)
         start_polling()
-        print(err)
+
 
 if __name__ == "__main__":
     start_polling()
