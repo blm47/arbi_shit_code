@@ -168,6 +168,8 @@ while x < 1:
                 print('Получаем баланс с Полоникса:')
                 balans_poloniex = Poloniex.call_api(command="returnBalances")
                 while balans_poloniex['Res'] == 'False':
+                    print('Неудалось получить баланс с Poloniex. Возвращаюсь в начало')
+                    print(balans_poloniex)
                     balans_poloniex = Poloniex.call_api(command="returnBalances")
                 # balans_poloniex = call_api_poloniex(command="returnAvailableAccountBalances") #Получение ДОСТУПНОГО Баланса
                 # balans_poloniex = balans_poloniex['exchange']
@@ -186,14 +188,16 @@ while x < 1:
                 balanses = {Poloniex.name:balans_poloniex, Exmo.name: balans_exmo, Bitfinex.name:balans_bitfinex,Wex.name:balans_wex}
                 nowBTC =float(balanses['Exmo']['BTC']) + float(balanses['Poloniex']['BTC'])
                 nowZEC =float(balanses['Exmo']['ZEC']) + float(balanses['Poloniex']['ZEC'])# + float(balanses['Wex']['ZEC'])
-                nowBCH =float(balanses['Exmo']['BCH']) + float(balanses['Poloniex']['BCH'])# + float(balanses['Wex']['BCH'])
+                #nowBCH =float(balanses['Exmo']['BCH']) + float(balanses['Poloniex']['BCH'])# + float(balanses['Wex']['BCH'])
+                nowBCH = 0
                 nowETH =float(balanses['Exmo']['ETH']) + float(balanses['Poloniex']['ETH'])# + float(balanses['Wex']['ETH'])
                 log('Баланс на биржах: ', balanses)
                 bd.write('balans_log',{'account_name': account, 'cur_time':cur_time(), 'all_balanses': balanses})
                 log('Текущий баланс всех бирж суммированный по парам. BTC: ', nowBTC, ' ZEC: ', nowZEC, ' BCH: ', nowBCH, ' ETH: ', nowETH)
                 balans_checker += 1
-            except Exception:
-                pass
+            except Exception as e:
+                log('%s'%e)
+
 #Балансы получены________
 #Получаем книги ордеров:_____
         #log('Получаем книгу ордеров с Ексмо по паре: ', para['Exmo'], '...')
@@ -359,6 +363,3 @@ while x < 1:
 
 
         #________Конец переписанного кода
-
-
-
