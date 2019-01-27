@@ -215,6 +215,7 @@ def get_order_book_exmo():
 def get_all_balans(acc_name,time=str(datetime.now())[:10]): #yyyy-mm-dd hh:mm:ss
     err = ''
     order_book_exmo= get_order_book_exmo()
+    order_book_poloniex = requests.get('https://poloniex.com/public?command=returnTicker').json()
     bd = MarketClass.DataBase('local', 'local.db')
     try:
         all_balans = bd.read('balans_log',{'account_name':acc_name,'cur_time':'{0}%'.format(str(time)[:-4])})[-1][2]
@@ -245,7 +246,10 @@ def get_all_balans(acc_name,time=str(datetime.now())[:10]): #yyyy-mm-dd hh:mm:ss
             try:
                 btc +=  float(order_book_exmo[crypt + '_BTC']['ask'][0][0]) * all_not_null_balans_po_param[crypt]
             except KeyError:
-                err+='\n<code>Не удалось посчитать сколько будет в BTC {0} {1}</code>'.format(all_not_null_balans_po_param[crypt],crypt)
+                try:
+                    btc += float(order_book_poloniex['BTC_%s'%crypt]['last']) * all_not_null_balans_po_param[crypt]
+                except KeyError:
+                    err+='\n<code>Не удалось посчитать сколько будет в BTC {0} {1}</code>'.format(all_not_null_balans_po_param[crypt],crypt)
     now_bal_in_rub = round(btc * float(order_book_exmo['BTC_RUB']['ask'][0][0]))
     now_bal_in_rub = denejnii_vid(now_bal_in_rub)
     return [all_not_null_balans,all_not_null_balans_po_param,round(btc,8),now_bal_in_rub,err]
